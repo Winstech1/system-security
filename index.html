@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baofeng BF-888S | Pneuma Tech Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #0a0b0f;
+    --bg-card: #111318;
+    --bg-card2: #161820;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --accent3: #c084fc;
+    --orange: #f97316;
+    --orange2: #fb923c;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: rgba(124,58,237,0.2);
+    --glow: 0 0 40px rgba(124,58,237,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ANNOUNCEMENT BAR */
+  .announce {
+    background: linear-gradient(90deg, var(--accent), var(--orange), var(--accent));
+    background-size: 200% auto;
+    animation: gradshift 4s linear infinite;
+    text-align: center;
+    padding: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  @keyframes gradshift { to { background-position: 200% center; } }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 5%;
+    background: rgba(10,11,15,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: white;
+    box-shadow: 0 0 20px rgba(124,58,237,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .logo-icon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shine 3s infinite;
+  }
+  @keyframes shine { 0%,100%{transform:rotate(45deg) translate(-100%,-100%)} 50%{transform:rotate(45deg) translate(100%,100%)} }
+
+  .logo-text { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.1; }
+  .logo-text span { color: var(--accent3); display: block; font-size: 10px; letter-spacing: 3px; font-weight: 500; }
+
+  .nav-cta {
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(249,115,22,0.4); }
+
+  /* HERO */
+  .hero {
+    min-height: 92vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 40px;
+    padding: 80px 5%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -100px;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-badge::before { content: '●'; animation: pulse 2s infinite; color: var(--orange); font-size: 8px; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 7vw, 96px);
+    line-height: 0.95;
+    margin-bottom: 20px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .hero-title .line1 { color: var(--text); }
+  .hero-title .line2 {
+    background: linear-gradient(135deg, var(--accent2), var(--accent3), var(--orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-title .line3 { color: var(--text); font-size: 0.6em; letter-spacing: 8px; }
+
+  .hero-desc {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 480px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.8s 0.2s ease both;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--orange), #ea580c);
+    color: white;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(249,115,22,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(249,115,22,0.5); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+  .btn-secondary:hover { border-color: var(--accent3); color: var(--accent3); background: rgba(124,58,237,0.05); }
+
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 40px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; background: linear-gradient(135deg, var(--accent2), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  .hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-image-wrap {
+    position: relative;
+    width: 420px;
+    height: 420px;
+  }
+
+  /* Animated rings */
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(124,58,237,0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin 20s linear infinite;
+  }
+  .ring:nth-child(1) { width: 320px; height: 320px; }
+  .ring:nth-child(2) { width: 400px; height: 400px; animation-duration: 30s; animation-direction: reverse; border-color: rgba(249,115,22,0.15); }
+  .ring:nth-child(3) { width: 480px; height: 480px; animation-duration: 40s; border-style: dashed; }
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+  .walkie-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px;
+    filter: drop-shadow(0 20px 60px rgba(124,58,237,0.4));
+    animation: float 4s ease-in-out infinite;
+    z-index: 2;
+  }
+  @keyframes float { 0%,100%{transform:translate(-50%,-50%) translateY(0)} 50%{transform:translate(-50%,-50%) translateY(-20px)} }
+
+  .glow-orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(124,58,237,0.25), transparent);
+    border-radius: 50%;
+    z-index: 1;
+    animation: breathe 3s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.3)} }
+
+  /* Floating badges on hero image */
+  .float-badge {
+    position: absolute;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    white-space: nowrap;
+    z-index: 5;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .float-badge.top-right { top: 30px; right: -20px; color: var(--accent3); border-color: rgba(124,58,237,0.4); }
+  .float-badge.bottom-left { bottom: 60px; left: -30px; color: var(--orange); border-color: rgba(249,115,22,0.4); }
+  .float-badge.top-left { top: 80px; left: -20px; color: #34d399; border-color: rgba(52,211,153,0.4); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* DIVIDER */
+  .section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 0 5%; }
+
+  /* SECTIONS */
+  section { padding: 80px 5%; }
+
+  .section-tag {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .section-subtitle {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 600px;
+    line-height: 1.8;
+  }
+
+  .section-header { margin-bottom: 56px; }
+
+  /* FEATURES GRID */
+  .features-intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 56px;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .feature-card:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.3), var(--glow); }
+  .feature-card:hover::before { transform: scaleX(1); }
+
+  .feature-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: rgba(124,58,237,0.2);
+    line-height: 1;
+    margin-bottom: 12px;
+    transition: color 0.3s;
+  }
+  .feature-card:hover .feature-num { color: rgba(124,58,237,0.4); }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(124,58,237,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 22px;
+    transition: background 0.3s;
+  }
+  .feature-card:hover .feature-icon { background: rgba(124,58,237,0.2); }
+
+  .feature-title { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .feature-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* SPEC TABLE */
+  .specs-section {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .spec-grid { display: grid; gap: 0; }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
+    transition: background 0.2s;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 8px;
+  }
+  .spec-row:hover { background: rgba(124,58,237,0.05); }
+  .spec-key { color: var(--text-muted); font-weight: 500; }
+  .spec-val { color: var(--text); font-weight: 600; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; }
+
+  /* PRICING */
+  .pricing-section { background: var(--bg-dark); }
+
+  .pricing-intro {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .price-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .price-card.popular {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.08);
+  }
+  .price-card.popular::before {
+    content: 'POPULAR';
+    position: absolute;
+    top: 12px;
+    right: -28px;
+    background: var(--orange);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 36px;
+    transform: rotate(45deg);
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .price-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.3), 0 0 30px rgba(124,58,237,0.2); border-color: var(--accent2); }
+
+  .price-qty {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: var(--accent3);
+    line-height: 1;
+  }
+  .price-unit { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 500; }
+  .price-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .price-amount span { font-size: 16px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 300; }
+  .price-earpiece { font-size: 11px; color: #34d399; font-weight: 500; }
+
+  /* TESTIMONIALS */
+  .testimonials { background: var(--bg-card2); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .testimonial-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+  }
+  .testimonial-card:hover { border-color: rgba(124,58,237,0.3); transform: translateY(-3px); }
+
+  .stars { color: #fbbf24; font-size: 14px; margin-bottom: 12px; letter-spacing: 2px; }
+  .testimonial-text { font-size: 15px; color: var(--text-muted); line-height: 1.8; margin-bottom: 20px; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .author-name { font-weight: 600; font-size: 15px; font-family: 'Rajdhani', sans-serif; }
+  .author-loc { font-size: 12px; color: var(--text-muted); }
+
+  /* HOW TO USE */
+  .steps { counter-reset: step; }
+  .step-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    align-items: start;
+    transition: all 0.3s;
+  }
+  .step-item:hover { padding-left: 12px; }
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    color: rgba(124,58,237,0.25);
+    line-height: 1;
+  }
+  .step-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* ORDER FORM */
+  .order-section {
+    background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(249,115,22,0.03));
+    border-top: 1px solid var(--border);
+  }
+
+  .order-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+  }
+
+  .order-title {
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent2), var(--orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .order-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 36px; font-size: 15px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-full { grid-column: 1 / -1; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.05);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+  }
+  select option { background: #1a1b22; }
+
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--orange), #ea580c);
+    color: white;
+    border: none;
+    padding: 18px;
+    border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg) translate(-100%, -100%);
+    transition: transform 0.6s;
+  }
+  .submit-btn:hover { box-shadow: 0 8px 30px rgba(249,115,22,0.5); transform: translateY(-2px); }
+  .submit-btn:hover::after { transform: rotate(45deg) translate(100%, 100%); }
+
+  .order-notice {
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--orange2);
+    margin-top: 20px;
+    line-height: 1.7;
+  }
+
+  .trust-badges {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+  .trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .trust-badge .icon { color: #34d399; font-size: 16px; }
+
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    cursor: pointer;
+    transition: color 0.3s;
+    user-select: none;
+  }
+  .faq-question:hover { color: var(--accent3); }
+  .faq-question .chevron { transition: transform 0.3s; font-size: 20px; color: var(--accent3); }
+  .faq-item.open .faq-question { color: var(--accent3); }
+  .faq-item.open .chevron { transform: rotate(180deg); }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .faq-item.open .faq-answer { max-height: 500px; padding-bottom: 20px; }
+
+  /* DELIVERY */
+  .delivery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 36px;
+  }
+  .delivery-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .delivery-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .delivery-icon { font-size: 32px; margin-bottom: 10px; }
+  .delivery-region { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .delivery-time { font-size: 22px; font-family: 'Bebas Neue', sans-serif; color: var(--accent3); }
+
+  /* FOOTER */
+  footer {
+    background: #07080b;
+    border-top: 1px solid var(--border);
+    padding: 48px 5% 32px;
+  }
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 24px;
+  }
+  .footer-brand p { color: var(--text-muted); font-size: 14px; max-width: 280px; margin-top: 12px; line-height: 1.7; }
+  .footer-links h4 { font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 2px; font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+  .footer-links a { display: block; color: var(--text-muted); text-decoration: none; font-size: 14px; margin-bottom: 10px; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent3); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-copy { font-size: 13px; color: var(--text-muted); }
+
+  /* SCROLL TO TOP */
+  .scroll-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .scroll-top.visible { opacity: 1; pointer-events: all; }
+  .scroll-top:hover { transform: translateY(-3px); background: var(--accent2); }
+
+  /* RESPONSIVE */
+  @media(max-width: 900px) {
+    .hero { grid-template-columns: 1fr; text-align: center; padding: 60px 5%; }
+    .hero-image { display: none; }
+    .hero-actions { justify-content: center; }
+    .hero-stats { justify-content: center; }
+    .features-intro { flex-direction: column; }
+    .specs-section { grid-template-columns: 1fr; gap: 32px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .order-wrap { padding: 28px 20px; }
+    .footer-top { flex-direction: column; }
+  }
+
+  /* WHATSAPP FLOAT */
+  .whatsapp-float {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 52px;
+    height: 52px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 26px;
+    transition: all 0.3s;
+    z-index: 50;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+    text-decoration: none;
+  }
+  .whatsapp-float:hover { transform: scale(1.1) translateY(-2px); box-shadow: 0 8px 30px rgba(37,211,102,0.5); }
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT -->
+<div class="announce">🔥 FREE NATIONWIDE DELIVERY — LIMITED STOCK AVAILABLE — ORDER NOW 🔥</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">P</div>
+    <div class="logo-text">
+      PNEUMA TECH HUB
+      <span>ELITE COMMUNICATION</span>
+    </div>
+  </div>
+  <a href="#order" class="nav-cta">ORDER NOW →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🔴 Limited Stock — Order Today</div>
+    <h1 class="hero-title">
+      <span class="line1">BAOFENG</span><br>
+      <span class="line2">BF-888S</span><br>
+      <span class="line3">WALKIE TALKIE</span>
+    </h1>
+    <p class="hero-desc">Professional-grade two-way radio for security teams, schools, churches, events, warehouses & construction sites. Stay connected. Respond faster. Operate smarter.</p>
+    <div class="hero-actions">
+      <a href="#order" class="btn-primary">🛒 Place Your Order</a>
+      <a href="#pricing" class="btn-secondary">View Pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">6KM</div>
+        <div class="stat-label">Max Range</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">16</div>
+        <div class="stat-label">Channels</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">5W</div>
+        <div class="stat-label">Output</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">IP45</div>
+        <div class="stat-label">Waterproof</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="hero-image-wrap">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="glow-orb"></div>
+      <svg class="walkie-img" viewBox="0 0 200 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Antenna -->
+        <rect x="88" y="0" width="8" height="80" rx="4" fill="#2a2d3e"/>
+        <rect x="90" y="0" width="4" height="80" rx="2" fill="#3a3d4e"/>
+        <!-- Main Body -->
+        <rect x="40" y="70" width="120" height="290" rx="20" fill="#1a1d2e"/>
+        <rect x="42" y="72" width="116" height="286" rx="19" fill="#20243a"/>
+        <!-- Speaker Grille -->
+        <rect x="55" y="85" width="90" height="60" rx="10" fill="#111420"/>
+        <g opacity="0.6">
+          <rect x="62" y="96" width="76" height="3" rx="1.5" fill="#3a3d5e"/>
+          <rect x="62" y="104" width="76" height="3" rx="1.5" fill="#3a3d5e"/>
+          <rect x="62" y="112" width="76" height="3" rx="1.5" fill="#3a3d5e"/>
+          <rect x="62" y="120" width="76" height="3" rx="1.5" fill="#3a3d5e"/>
+          <rect x="62" y="128" width="76" height="3" rx="1.5" fill="#3a3d5e"/>
+        </g>
+        <!-- Screen area -->
+        <rect x="55" y="158" width="90" height="50" rx="8" fill="#0d1020"/>
+        <rect x="60" y="163" width="80" height="40" rx="6" fill="#111830"/>
+        <text x="100" y="183" font-family="monospace" font-size="10" fill="#7c3aed" text-anchor="middle">CH: 01</text>
+        <text x="100" y="197" font-family="monospace" font-size="8" fill="#4a5580" text-anchor="middle">432.500 MHz</text>
+        <!-- Buttons row -->
+        <rect x="60" y="222" width="30" height="18" rx="6" fill="#2a2d3e"/>
+        <rect x="85" y="222" width="30" height="18" rx="6" fill="#2a2d3e"/>
+        <rect x="110" y="222" width="30" height="18" rx="6" fill="#2a2d3e"/>
+        <!-- PTT Button (orange) -->
+        <rect x="20" y="180" width="18" height="60" rx="6" fill="#f97316"/>
+        <rect x="22" y="182" width="14" height="56" rx="5" fill="#fb923c"/>
+        <text x="29" y="215" font-family="sans-serif" font-size="6" fill="white" text-anchor="middle">PTT</text>
+        <!-- Channel knob area -->
+        <rect x="60" y="254" width="80" height="60" rx="8" fill="#111420"/>
+        <circle cx="100" cy="283" r="22" fill="#1a1d2e"/>
+        <circle cx="100" cy="283" r="18" fill="#222538"/>
+        <circle cx="100" cy="283" r="6" fill="#7c3aed"/>
+        <!-- Bottom grip -->
+        <rect x="55" y="325" width="90" height="25" rx="8" fill="#111420"/>
+        <g opacity="0.4">
+          <rect x="62" y="330" width="76" height="2" rx="1" fill="#3a3d5e"/>
+          <rect x="62" y="335" width="76" height="2" rx="1" fill="#3a3d5e"/>
+          <rect x="62" y="340" width="76" height="2" rx="1" fill="#3a3d5e"/>
+        </g>
+        <!-- Charging port -->
+        <rect x="80" y="352" width="40" height="8" rx="4" fill="#111420"/>
+        <rect x="85" y="354" width="30" height="4" rx="2" fill="#0a0b12"/>
+        <!-- Brand label -->
+        <text x="100" y="390" font-family="sans-serif" font-size="9" fill="#7c3aed" text-anchor="middle" font-weight="bold">BAOFENG</text>
+        <text x="100" y="402" font-family="sans-serif" font-size="7" fill="#4a5580" text-anchor="middle">BF-888S</text>
+      </svg>
+      <div class="float-badge top-right">📡 3-6 KM Range</div>
+      <div class="float-badge bottom-left">🔋 1500 mAh Battery</div>
+      <div class="float-badge top-left">✅ Free Earpiece</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-intro">
+    <div>
+      <div class="section-tag">Why Choose BF-888S</div>
+      <h2 class="section-title">TOP 10<br><span style="background:linear-gradient(135deg,var(--accent2),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">KEY FEATURES</span></h2>
+    </div>
+    <p class="section-subtitle">Engineered for professionals who demand reliability, clarity, and performance in every transmission.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">📡</div>
+      <div class="feature-title">Wide Frequency Range (400–470 MHz)</div>
+      <p class="feature-desc">UHF band delivers crystal-clear, stable communication up to 6km in open terrain. Ideal for outdoor and large-venue coordination.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">02</div>
+      <div class="feature-icon">📻</div>
+      <div class="feature-title">16 Programmable Channels</div>
+      <p class="feature-desc">Select the most suitable channel for your team's communication needs, reducing interference and enhancing privacy across departments.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">03</div>
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Adjustable Power Output (1–5W)</div>
+      <p class="feature-desc">Optimize between communication range and battery life based on your specific environment and requirements with a single adjustment.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">04</div>
+      <div class="feature-icon">🔋</div>
+      <div class="feature-title">Rechargeable Battery + Desktop Charger</div>
+      <p class="feature-desc">1500mAh battery pack with desktop charging dock. Cost-effective and always ready — no constant battery replacements needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">05</div>
+      <div class="feature-icon">🎛️</div>
+      <div class="feature-title">User-Friendly Interface</div>
+      <p class="feature-desc">Intuitive power/volume knob and PTT button. Minimal learning curve — your team can pick it up and communicate in seconds.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">06</div>
+      <div class="feature-icon">🔇</div>
+      <div class="feature-title">Squelch Noise Cancellation</div>
+      <p class="feature-desc">Intelligent squelch function eliminates background noise during inactive periods, delivering clean, uninterrupted communication.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">07</div>
+      <div class="feature-icon">🎙️</div>
+      <div class="feature-title">VOX Voice-Activated Transmission</div>
+      <p class="feature-desc">Hands-free operation with voice activation. Perfect for security personnel and field workers who need both hands free at all times.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">08</div>
+      <div class="feature-icon">💡</div>
+      <div class="feature-title">Built-in LED Flashlight + Emergency Alarm</div>
+      <p class="feature-desc">Integrated LED torch and emergency alert system make this the complete emergency-ready communication tool for any situation.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">09</div>
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-title">CTCSS / DCS Secure Codes</div>
+      <p class="feature-desc">Private channel encryption prevents eavesdropping. Keep your team communications secure and unauthorized users off your frequency.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">10</div>
+      <div class="feature-icon">🏗️</div>
+      <div class="feature-title">Versatile Professional Applications</div>
+      <p class="feature-desc">Designed for security, churches, schools, events, construction, warehouses, and any environment demanding reliable team communication.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SPECS -->
+<section id="specs">
+  <div class="section-header">
+    <div class="section-tag">Technical Data</div>
+    <h2 class="section-title">PRODUCT <span style="color:var(--accent3)">SPECIFICATIONS</span></h2>
+  </div>
+  <div class="specs-section">
+    <div>
+      <div class="spec-grid">
+        <div class="spec-row"><span class="spec-key">Model</span><span class="spec-val">Baofeng BF-888S</span></div>
+        <div class="spec-row"><span class="spec-key">Frequency Range</span><span class="spec-val">UHF 400–470 MHz</span></div>
+        <div class="spec-row"><span class="spec-key">Output Power</span><span class="spec-val">1–5 Watts</span></div>
+        <div class="spec-row"><span class="spec-key">Channels</span><span class="spec-val">16 Programmable</span></div>
+        <div class="spec-row"><span class="spec-key">Battery Capacity</span><span class="spec-val">1500 mAh / 3.7V</span></div>
+        <div class="spec-row"><span class="spec-key">Max Range</span><span class="spec-val">3–6 km</span></div>
+        <div class="spec-row"><span class="spec-key">Audio Output</span><span class="spec-val">1000 mW</span></div>
+        <div class="spec-row"><span class="spec-key">Waterproof Rating</span><span class="spec-val">IP45</span></div>
+        <div class="spec-row"><span class="spec-key">Dimensions</span><span class="spec-val">115 × 60 × 33 mm</span></div>
+        <div class="spec-row"><span class="spec-key">Net Weight</span><span class="spec-val">180g</span></div>
+        <div class="spec-row"><span class="spec-key">Operating Temp</span><span class="spec-val">–30°C to +60°C</span></div>
+        <div class="spec-row"><span class="spec-key">Antenna Impedance</span><span class="spec-val">50 Ohm</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-tag">What's In The Box</div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:32px;margin-bottom:24px;">YOUR ORDER <span style="color:var(--accent3)">PACKAGE</span></h3>
+      <div style="display:grid;gap:12px;">
+        <div class="spec-row"><span class="spec-key">📻</span><span class="spec-val">BF-888S Walkie Talkie Unit(s)</span></div>
+        <div class="spec-row"><span class="spec-key">🎧</span><span class="spec-val">Matching Earpiece Set (Same Quantity)</span></div>
+        <div class="spec-row"><span class="spec-key">🔋</span><span class="spec-val">Li-ion Battery Pack (1500mAh)</span></div>
+        <div class="spec-row"><span class="spec-key">⚡</span><span class="spec-val">Desktop Charging Dock</span></div>
+        <div class="spec-row"><span class="spec-key">📡</span><span class="spec-val">Replacement Antenna</span></div>
+        <div class="spec-row"><span class="spec-key">📖</span><span class="spec-val">User Manual</span></div>
+        <div class="spec-row"><span class="spec-key">🪝</span><span class="spec-val">Belt Clip</span></div>
+      </div>
+      <div style="margin-top:28px;padding:20px;background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.2);border-radius:12px;">
+        <div style="color:#34d399;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">✅ BONUS: FREE EARPIECE MATCHING</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.7;">Every order includes the exact same quantity of professional earpieces as your walkie talkies. Equip your entire team at no extra cost.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+  <div class="pricing-intro">
+    <div class="section-tag" style="display:block;text-align:center;">Transparent Pricing</div>
+    <h2 class="section-title" style="text-align:center;">QUANTITY & <span style="color:var(--orange)">PRICING</span></h2>
+    <p class="section-subtitle" style="margin:0 auto;text-align:center;">Every package includes FREE earpieces + FREE nationwide delivery</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card" onclick="setOrder(this,'2Pcs + 2 Earpieces @ GH₵ 550')">
+      <div class="price-qty">2</div>
+      <div class="price-unit">Units + 2 Earpieces</div>
+      <div class="price-amount">GH₵ 550</div>
+      <div class="price-earpiece">✅ 2 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'4Pcs + 4 Earpieces @ GH₵ 940')">
+      <div class="price-qty">4</div>
+      <div class="price-unit">Units + 4 Earpieces</div>
+      <div class="price-amount">GH₵ 940</div>
+      <div class="price-earpiece">✅ 4 Earpieces Included</div>
+    </div>
+    <div class="price-card popular" onclick="setOrder(this,'6Pcs + 6 Earpieces @ GH₵ 1,340')">
+      <div class="price-qty">6</div>
+      <div class="price-unit">Units + 6 Earpieces</div>
+      <div class="price-amount">GH₵ 1,340</div>
+      <div class="price-earpiece">✅ 6 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'8Pcs + 8 Earpieces @ GH₵ 1,830')">
+      <div class="price-qty">8</div>
+      <div class="price-unit">Units + 8 Earpieces</div>
+      <div class="price-amount">GH₵ 1,830</div>
+      <div class="price-earpiece">✅ 8 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'10Pcs + 10 Earpieces @ GH₵ 2,280')">
+      <div class="price-qty">10</div>
+      <div class="price-unit">Units + 10 Earpieces</div>
+      <div class="price-amount">GH₵ 2,280</div>
+      <div class="price-earpiece">✅ 10 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'12Pcs + 12 Earpieces @ GH₵ 2,740')">
+      <div class="price-qty">12</div>
+      <div class="price-unit">Units + 12 Earpieces</div>
+      <div class="price-amount">GH₵ 2,740</div>
+      <div class="price-earpiece">✅ 12 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'14Pcs + 14 Earpieces @ GH₵ 3,200')">
+      <div class="price-qty">14</div>
+      <div class="price-unit">Units + 14 Earpieces</div>
+      <div class="price-amount">GH₵ 3,200</div>
+      <div class="price-earpiece">✅ 14 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'16Pcs + 16 Earpieces @ GH₵ 3,660')">
+      <div class="price-qty">16</div>
+      <div class="price-unit">Units + 16 Earpieces</div>
+      <div class="price-amount">GH₵ 3,660</div>
+      <div class="price-earpiece">✅ 16 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'20Pcs + 20 Earpieces @ GH₵ 4,570')">
+      <div class="price-qty">20</div>
+      <div class="price-unit">Units + 20 Earpieces</div>
+      <div class="price-amount">GH₵ 4,570</div>
+      <div class="price-earpiece">✅ 20 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'24Pcs + 24 Earpieces @ GH₵ 5,510')">
+      <div class="price-qty">24</div>
+      <div class="price-unit">Units + 24 Earpieces</div>
+      <div class="price-amount">GH₵ 5,510</div>
+      <div class="price-earpiece">✅ 24 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'26Pcs + 26 Earpieces @ GH₵ 5,960')">
+      <div class="price-qty">26</div>
+      <div class="price-unit">Units + 26 Earpieces</div>
+      <div class="price-amount">GH₵ 5,960</div>
+      <div class="price-earpiece">✅ 26 Earpieces Included</div>
+    </div>
+    <div class="price-card" onclick="setOrder(this,'30Pcs + 30 Earpieces @ GH₵ 6,870')">
+      <div class="price-qty">30</div>
+      <div class="price-unit">Units + 30 Earpieces</div>
+      <div class="price-amount">GH₵ 6,870</div>
+      <div class="price-earpiece">✅ 30 Earpieces Included</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:40px;">
+    <a href="#order" class="btn-primary" style="display:inline-flex;">🛒 Select & Order Now →</a>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-header">
+    <div class="section-tag">Customer Reviews</div>
+    <h2 class="section-title">WHAT OUR <span style="color:var(--accent3)">CUSTOMERS SAY</span></h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Living in Cape Coast, the BF-888S has been my go-to for local events. The range is impressive, even in crowded spaces. It's durable, and the battery lasts longer than expected. Highly recommended!"</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">Y</div>
+        <div><div class="author-name">Yaw Ofori</div><div class="author-loc">📍 Cape Coast</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"The Baofeng BF-888S is a game-changer! I've tested it in crowded Accra streets and on trips. It delivered crisp communication, and the battery life is impressive. Definitely a must-have."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">A</div>
+        <div><div class="author-name">Akua Mensah</div><div class="author-loc">📍 Accra</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Everything in perfect condition. They are used a lot and very reliable with good battery support. The seller is recommended — packaging was superb and delivery was fast!"</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">A</div>
+        <div><div class="author-name">Ama Darko</div><div class="author-loc">📍 Ho</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"The products arrived very fast and in perfect condition! Impeccable packaging! This seller knows how to do business! Ordered several units and they all work perfectly."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">A</div>
+        <div><div class="author-name">Adwoa Agyeman</div><div class="author-loc">📍 Koforidua</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★☆</div>
+      <p class="testimonial-text">"Compact, arrived in 3 days. The sound is clear. Range in the city isn't the largest due to interference from buildings, but in open areas it's excellent. Would buy again."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">A</div>
+        <div><div class="author-name">Abena Boakye</div><div class="author-loc">📍 Sunyani</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Very excellent and easy to use. Clear audio, durable build — exactly what my security team needed. Communication has improved significantly since we equipped the team."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">K</div>
+        <div><div class="author-name">Kwabena Nkrumah</div><div class="author-loc">📍 Bolgatanga</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- HOW TO USE -->
+<section id="how-to-use">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;" class="how-to-grid">
+    <div>
+      <div class="section-tag">Quick Start Guide</div>
+      <h2 class="section-title">HOW TO <span style="color:var(--accent3)">OPERATE</span></h2>
+      <p class="section-subtitle" style="margin-bottom:36px;">Get your team up and communicating in under 5 minutes with this step-by-step guide.</p>
+      <div class="steps">
+        <div class="step-item">
+          <div class="step-num">01</div>
+          <div><div class="step-title">Power On / Off</div><p class="step-desc">Press and hold the Power/Volume knob until the radio powers on. Repeat to power off. The LED indicator confirms operation.</p></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">02</div>
+          <div><div class="step-title">Select Your Channel</div><p class="step-desc">Use the Channel Up/Down buttons to cycle through 16 channels. Ensure all team units are on the same channel for communication.</p></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">03</div>
+          <div><div class="step-title">Adjust Volume</div><p class="step-desc">Rotate the Power/Volume knob clockwise to increase or counterclockwise to decrease the volume to a comfortable level.</p></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">04</div>
+          <div><div class="step-title">Transmit (Talk)</div><p class="step-desc">Hold down the orange PTT (Push-to-Talk) button on the side and speak clearly into the microphone. Release to listen.</p></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">05</div>
+          <div><div class="step-title">Enable VOX (Hands-Free)</div><p class="step-desc">Activate VOX mode for hands-free operation. The radio will automatically transmit when it detects your voice — perfect for field work.</p></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">06</div>
+          <div><div class="step-title">Charging</div><p class="step-desc">Place the radio in the desktop dock or connect via the charging port. Green LED indicates charging; the light changes when fully charged.</p></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-tag" style="margin-top:56px;">Frequently Asked Questions</div>
+      <h2 class="section-title">FAQS</h2>
+      <div style="margin-top:24px;">
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">What is the actual communication range? <span class="chevron">⌄</span></div>
+          <div class="faq-answer">In open terrain with line-of-sight and minimal interference, you can achieve 3–6km. In urban environments with buildings and interference, the effective range is typically 1–2km. Range depends heavily on terrain, obstacles, and power setting.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">Do I need a license to use this radio in Ghana? <span class="chevron">⌄</span></div>
+          <div class="faq-answer">For private, non-commercial use within UHF frequencies, usage is generally permitted. For commercial business use, we recommend checking with the National Communications Authority (NCA) Ghana for the latest regulations.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">Can units from different brands communicate together? <span class="chevron">⌄</span></div>
+          <div class="faq-answer">Yes! The BF-888S can communicate with any other radio that operates on the same frequency and channel within the UHF 400-470MHz range, regardless of brand, as long as they're set to the same channel.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">How long does the battery last per charge? <span class="chevron">⌄</span></div>
+          <div class="faq-answer">The 1500mAh battery provides 8–12 hours of typical use depending on transmission frequency and power setting. In standby (receiving only), the battery can last up to 24 hours.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">Is this radio waterproof? <span class="chevron">⌄</span></div>
+          <div class="faq-answer">The BF-888S carries an IP45 rating, meaning it's protected against dust ingress and water splashes from any direction. It's not suitable for submersion but can handle rain and light splashes with ease.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">What is your return/replacement policy? <span class="chevron">⌄</span></div>
+          <div class="faq-answer">If your item arrives damaged or develops a fault within 14 days of normal usage, we will gladly issue a replacement or refund. Contact us immediately with photos and your order details.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- DELIVERY -->
+<section>
+  <div class="section-header">
+    <div class="section-tag">Delivery Information</div>
+    <h2 class="section-title">FREE NATIONWIDE <span style="color:var(--accent3)">DELIVERY</span></h2>
+    <p class="section-subtitle">We ship across all regions of Ghana. Fast, reliable delivery to your doorstep.</p>
+  </div>
+  <div class="delivery-grid">
+    <div class="delivery-card">
+      <div class="delivery-icon">🏙️</div>
+      <div class="delivery-region">Within Accra</div>
+      <div class="delivery-time">24 HRS</div>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon">🌊</div>
+      <div class="delivery-region">Western States</div>
+      <div class="delivery-time">3 DAYS</div>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon">🌄</div>
+      <div class="delivery-region">Eastern States</div>
+      <div class="delivery-time">4 DAYS</div>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon">🌍</div>
+      <div class="delivery-region">Northern States</div>
+      <div class="delivery-time">6 DAYS</div>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon">💳</div>
+      <div class="delivery-region">Payment Methods</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.6;">Cash on Delivery<br>Bank Transfer<br>Mobile Money</div>
+    </div>
+  </div>
+  <div style="margin-top:24px;padding:20px 24px;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:12px;max-width:700px;">
+    <p style="font-size:14px;color:var(--orange2);line-height:1.7;">📦 If your order hasn't arrived after 3–7 days (depending on your region), contact our customer service. We're always ready to help.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ORDER FORM -->
+<section id="order" class="order-section">
+  <h2 class="order-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);text-align:center;margin-bottom:8px;background:linear-gradient(135deg,var(--accent2),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">PLACE YOUR ORDER</h2>
+  <p style="text-align:center;color:var(--text-muted);margin-bottom:48px;font-size:16px;">Fill in your details and we will contact you to confirm delivery</p>
+  
+  <div class="order-wrap">
+    <h3 class="order-title" style="font-size:32px;">🛒 ORDER FORM</h3>
+    <p class="order-subtitle">Free Nationwide Delivery Included With Every Order</p>
+    
+    <form onsubmit="submitOrder(event)">
+      <div class="form-grid">
+        <div>
+          <label>Full Name *</label>
+          <input type="text" id="fullname" placeholder="Enter your full name" required>
+        </div>
+        <div>
+          <label>Phone Number *</label>
+          <input type="tel" id="phone" placeholder="e.g. 024 XXX XXXX" required>
+        </div>
+        <div>
+          <label>Second Phone Number *</label>
+          <input type="tel" id="phone2" placeholder="Alternative number" required>
+        </div>
+        <div>
+          <label>City *</label>
+          <input type="text" id="city" placeholder="Your city" required>
+        </div>
+        <div class="form-full">
+          <label>Delivery Address *</label>
+          <input type="text" id="address" placeholder="House number, street name, area..." required>
+        </div>
+        <div>
+          <label>Nearest Landmark / Bus Stop *</label>
+          <input type="text" id="landmark" placeholder="e.g. Near Accra Mall" required>
+        </div>
+        <div>
+          <label>Region *</label>
+          <select id="region" required>
+            <option value="">Select your region...</option>
+            <option>Greater Accra</option>
+            <option>Ashanti</option>
+            <option>Western</option>
+            <option>Central</option>
+            <option>Eastern</option>
+            <option>Volta</option>
+            <option>Northern</option>
+            <option>Upper East</option>
+            <option>Upper West</option>
+            <option>Brong-Ahafo</option>
+            <option>Oti</option>
+            <option>Savannah</option>
+            <option>North East</option>
+            <option>Bono</option>
+            <option>Bono East</option>
+            <option>Ahafo</option>
+            <option>Western North</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Quantity & Price *</label>
+          <select id="quantity" required>
+            <option value="">Choose your preferred quantity...</option>
+            <option>2Pcs + 2 Earpieces @ GH₵ 550</option>
+            <option>4Pcs + 4 Earpieces @ GH₵ 940</option>
+            <option>6Pcs + 6 Earpieces @ GH₵ 1,340</option>
+            <option>8Pcs + 8 Earpieces @ GH₵ 1,830</option>
+            <option>10Pcs + 10 Earpieces @ GH₵ 2,280</option>
+            <option>12Pcs + 12 Earpieces @ GH₵ 2,740</option>
+            <option>14Pcs + 14 Earpieces @ GH₵ 3,200</option>
+            <option>16Pcs + 16 Earpieces @ GH₵ 3,660</option>
+            <option>18Pcs + 18 Earpieces @ GH₵ 4,120</option>
+            <option>20Pcs + 20 Earpieces @ GH₵ 4,570</option>
+            <option>22Pcs + 22 Earpieces @ GH₵ 5,040</option>
+            <option>24Pcs + 24 Earpieces @ GH₵ 5,510</option>
+            <option>26Pcs + 26 Earpieces @ GH₵ 5,960</option>
+            <option>28Pcs + 28 Earpieces @ GH₵ 6,430</option>
+            <option>30Pcs + 30 Earpieces @ GH₵ 6,870</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Email Address (Optional)</label>
+          <input type="email" id="email" placeholder="For receiving your order confirmation">
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn">🛒 SUBMIT ORDER NOW</button>
+    </form>
+    
+    <div class="order-notice">
+      ⚠️ <strong>ORDER NOTICE:</strong> Please only place an order if you are available to receive delivery within the expected timeframe. We deliver to customers who are available for pickup. Thank you for your understanding.
+    </div>
+    
+    <div class="trust-badges">
+      <div class="trust-badge"><span class="icon">✅</span> Free Delivery</div>
+      <div class="trust-badge"><span class="icon">✅</span> Cash on Delivery</div>
+      <div class="trust-badge"><span class="icon">✅</span> 14-Day Return</div>
+      <div class="trust-badge"><span class="icon">✅</span> Free Earpieces</div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MESSAGE -->
+  <div id="success-msg" style="display:none;max-width:720px;margin:32px auto 0;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.3);border-radius:16px;padding:36px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+    <h3 style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#34d399;margin-bottom:8px;">ORDER RECEIVED!</h3>
+    <p style="color:var(--text-muted);font-size:15px;line-height:1.8;">Your order details are being sent to our WhatsApp. A new window will open — just press <strong style="color:#34d399;">Send</strong> to complete your order. Our team will confirm delivery shortly!</p>
+    <a href="https://wa.me/233257471816" target="_blank" style="display:inline-block;margin-top:20px;background:#25D366;color:white;padding:14px 32px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;text-decoration:none;">📱 Open WhatsApp Again</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo" style="margin-bottom:16px;">
+        <div class="logo-icon">P</div>
+        <div class="logo-text">PNEUMA TECH HUB<span>ELITE COMMUNICATION</span></div>
+      </div>
+      <p>Your trusted source for professional communication equipment in Ghana. Delivering quality, reliability, and exceptional service nationwide.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Quick Links</h4>
+      <a href="#features">Features</a>
+      <a href="#specs">Specifications</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#order">Order Now</a>
+    </div>
+    <div class="footer-links">
+      <h4>Support</h4>
+      <a href="#how-to-use">How to Use</a>
+      <a href="#how-to-use">FAQs</a>
+      <a href="#">Return Policy</a>
+      <a href="#">Shipping Policy</a>
+    </div>
+    <div class="footer-links">
+      <h4>Contact</h4>
+      <a href="tel:+233257471816">📞 +233257471816</a>
+      <a href="/cdn-cgi/l/email-protection#f39a9d959cb3839d96869e928796909b9b8691dd909c9e">✉️ <span class="__cf_email__" data-cfemail="365f58505976465853435b574253555e5e43541855595b">[email&#160;protected]</span></a>
+      <a href="#">📍 Accra, Ghana</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Pneuma Tech Hub. All Rights Reserved. | Professional Communication Equipment Ghana</p>
+    <div style="display:flex;gap:16px;font-size:13px;">
+      <a href="#" style="color:var(--text-muted);text-decoration:none;">Privacy Policy</a>
+      <a href="#" style="color:var(--text-muted);text-decoration:none;">Terms</a>
+      <a href="#" style="color:var(--text-muted);text-decoration:none;">Refund Policy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- FLOATING BUTTONS -->
+<a href="https://wa.me/233257471816" class="whatsapp-float" target="_blank" title="Chat on WhatsApp">📱</a>
+<div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // SCROLL TOP VISIBILITY
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scrollTop');
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // FAQ TOGGLE
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // SET ORDER FROM PRICING CARD
+  function setOrder(card, val) {
+    document.getElementById('quantity').value = val;
+    document.querySelectorAll('.price-card').forEach(c => c.style.outline = '');
+    card.style.outline = '2px solid var(--orange)';
+    document.getElementById('order').scrollIntoView({behavior:'smooth'});
+  }
+
+  // WHATSAPP INTEGRATION
+  const WHATSAPP_NUMBER = '233257471816'; // ← Your WhatsApp number (no + sign)
+
+  function submitOrder(e) {
+    e.preventDefault();
+
+    const fullname  = document.getElementById('fullname').value.trim();
+    const phone     = document.getElementById('phone').value.trim();
+    const phone2    = document.getElementById('phone2').value.trim();
+    const address   = document.getElementById('address').value.trim();
+    const landmark  = document.getElementById('landmark').value.trim();
+    const city      = document.getElementById('city').value.trim();
+    const region    = document.getElementById('region').value.trim();
+    const quantity  = document.getElementById('quantity').value.trim();
+    const email     = document.getElementById('email').value.trim();
+
+    // Build formatted WhatsApp message
+    const message = 
+`🛒 *NEW ORDER — PNEUMA TECH HUB*
+━━━━━━━━━━━━━━━━━━━━━
+📦 *Product:* Baofeng BF-888S Walkie Talkie
+🔢 *Order:* ${quantity}
+━━━━━━━━━━━━━━━━━━━━━
+👤 *Customer Details*
+• Name: ${fullname}
+• Phone 1: ${phone}
+• Phone 2: ${phone2}
+${email ? '• Email: ' + email : ''}
+━━━━━━━━━━━━━━━━━━━━━
+📍 *Delivery Details*
+• Address: ${address}
+• Landmark: ${landmark}
+• City: ${city}
+• Region: ${region}
+━━━━━━━━━━━━━━━━━━━━━
+✅ Please confirm this order. Thank you!`;
+
+    const encodedMsg = encodeURIComponent(message);
+    const waURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
+
+    // Show success message
+    e.target.style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+
+    // Open WhatsApp after short delay
+    setTimeout(() => {
+      window.open(waURL, '_blank');
+    }, 600);
+  }
+
+  // SCROLL ANIMATIONS
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animation = 'fadeUp 0.7s ease both';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.1});
+
+  document.querySelectorAll('.feature-card, .price-card, .testimonial-card, .delivery-card, .step-item').forEach(el => {
+    el.style.opacity = '0';
+    observer.observe(el);
+  });
+
+  // RESPONSIVE HOW-TO GRID
+  function checkWidth
